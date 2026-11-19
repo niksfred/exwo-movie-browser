@@ -1,8 +1,10 @@
-import { View, Text, Image, Button } from "react-native";
-import { movieKeys, useMovieDetails } from "../queries/movieQueries";
+import { Button, ScrollView, StyleSheet, Text, View } from "react-native";
 import queryClient from "../../../providers/queryClient";
-import { MovieSummary } from "../types";
 import { OmdbError } from "../api/omdb";
+import Poster from "../components/Poster";
+import { feedGutter } from "../homeFeedStyles";
+import { movieKeys, useMovieDetails } from "../queries/movieQueries";
+import type { MovieSummary } from "../types";
 
 type MovieDetailsScreenProps = {
   imdbId: string;
@@ -19,21 +21,71 @@ export default function MovieDetailsScreen({ imdbId }: MovieDetailsScreenProps) 
   const { isPending, isFetching, error, data, refetch } = useMovieDetails(imdbId);
 
   const movie = data ?? cachedMovie;
+  const metadata = [movie?.year, data?.runtime, data?.genre].filter(Boolean).join(" · ");
   const errorKind = error instanceof OmdbError ? error.kind : undefined;
-  const canRetry = errorKind === "server" || "network";
-  const needApiKey = errorKind === "config" || "auth";
+  const canRetry = errorKind === "server" || errorKind === "network";
+  const needApiKey = errorKind === "config" || errorKind === "auth";
   const errorMessage = needApiKey
-    ? "Set a valid Omdb API Key and restart app"
+    ? "Set a valid EXPO_PUBLIC_OMDB_API_KEY in .env.local and restart the app."
     : "There's a problem loading movie details.";
 
   return (
-    <View>
-      {movie?.posterUrl && <Image source={{ uri: movie.posterUrl }} width={100} height={150} />}
-      {movie && <Text>{movie.title}</Text>}
-      {data?.plot && <Text>{data.plot}</Text>}
-      {isPending && <Text>Loading movie...</Text>}
-      {error != null && <Text>{errorMessage}</Text>}
+    <ScrollView contentContainerStyle={styles.content}>
+      {movie && (
+        <View style={styles.summary}>
+          <Poster url={movie.posterUrl} width={148} />
+          <Text accessibilityRole="header" style={styles.title}>{movie.title}</Text>
+          {metadata !== "" && <Text style={styles.metadata}>{metadata}</Text>}
+        </View>
+      )}
+      {data?.plot && (
+        <View style={styles.section}>
+          <Text accessibilityRole="header" style={styles.heading}>Plot</Text>
+          <Text style={styles.body}>{data.plot}</Text>
+        </View>
+      )}
+      {data?.cast && (
+        <View style={styles.section}>
+          <Text accessibilityRole="header" style={styles.heading}>Cast</Text>
+          <Text style={styles.body}>{data.cast}</Text>
+        </View>
+      )}
+      {isPending && <Text style={styles.body}>Loading movie...</Text>}
+      {error != null && <Text style={styles.body}>{errorMessage}</Text>}
       {canRetry && <Button title="Retry" disabled={isFetching} onPress={() => void refetch()} />}
-    </View>
+    </ScrollView>
   );
 }
+
+const styles = StyleSheet.create({
+  content: {
+    paddingHorizontal: feedGutter,
+    paddingTop: 20,
+    paddingBottom: 32,
+    gap: 24,
+  },
+  summary: {
+    gap: 8,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: "700",
+    marginTop: 4,
+  },
+  metadata: {
+    color: "#525766",
+    fontSize: 15,
+    lineHeight: 22,
+  },
+  section: {
+    gap: 6,
+  },
+  heading: {
+    fontSize: 18,
+    fontWeight: "700",
+  },
+  body: {
+    fontSize: 16,
+    lineHeight: 24,
+  },
+});

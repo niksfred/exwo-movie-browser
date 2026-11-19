@@ -5,20 +5,15 @@ type MovieCollection = {
   layout: "rail" | "rows";
 };
 
-export const batmanCollection = {
-  id: "batman",
-  label: "Batman",
-  term: "Batman",
-  layout: "rail",
+export const rowCollection = {
+  id: "mission-impossible",
+  label: "Mission: Impossible",
+  term: "Mission: Impossible",
+  layout: "rows",
 } satisfies MovieCollection;
 
 export const collections = [
-  batmanCollection,
+  { id: "batman", label: "Batman", term: "Batman", layout: "rail" },
   { id: "star-trek", label: "Star Trek", term: "Star Trek", layout: "rail" },
-  {
-    id: "mission-impossible",
-    label: "Mission: Impossible",
-    term: "Mission: Impossible",
-    layout: "rows",
-  },
+  rowCollection,
 ] satisfies MovieCollection[];
