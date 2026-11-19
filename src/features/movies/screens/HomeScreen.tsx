@@ -1,4 +1,6 @@
-import { Button, Text, View } from 'react-native';
+import { View } from "react-native";
+import { batmanCollection } from "../collections";
+import MovieRailSection from "../components/MovieRailSection";
 
 type HomeScreenProps = {
   onSelectMovie: (imdbId: string) => void;
@@ -7,8 +9,11 @@ type HomeScreenProps = {
 export default function HomeScreen({ onSelectMovie }: HomeScreenProps) {
   return (
     <View>
-      <Text>Home Screen</Text>
-      <Button title="Open Batman Begins" onPress={() => onSelectMovie('tt0372784')} />
+      <MovieRailSection
+        label={batmanCollection.label}
+        term={batmanCollection.term}
+        onSelectMovie={onSelectMovie}
+      />
     </View>
   );
 }

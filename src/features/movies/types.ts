@@ -3,7 +3,7 @@ interface MovieSummary {
   title: string;
   year?: string;
   posterUrl?: string;
-};
+}
 
 interface MovieDetails extends MovieSummary {
   runtime?: string;
