@@ -33,4 +33,4 @@ For a device smoke check, swipe both rails, scroll down to Mission: Impossible, 
 
 - `src/app` contains the Expo Router routes. Details receives the IMDb ID in the route.
 - `src/features/movies` contains the screens, reusable movie components, collection settings, query hooks, and OMDb adapter.
-- `src/providers` holds the shared TanStack Query client. Search results can provide a cached poster and title while Details loads. Vertical rows reuse the detail cache to show genre when available.
+- `src/providers` holds the shared TanStack Query client. Search results can provide a cached poster and title while Details loads. Vertical rows show genre once the movie's details are cached. Home makes no extra requests for genre.

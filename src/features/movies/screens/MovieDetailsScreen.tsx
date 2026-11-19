@@ -1,6 +1,6 @@
-import { Button, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 import queryClient from "../../../providers/queryClient";
-import { OmdbError } from "../api/omdb";
+import MovieLoadError from "../components/MovieLoadError";
 import Poster from "../components/Poster";
 import { feedGutter } from "../homeFeedStyles";
 import { movieKeys, useMovieDetails } from "../queries/movieQueries";
@@ -22,12 +22,6 @@ export default function MovieDetailsScreen({ imdbId }: MovieDetailsScreenProps) 
 
   const movie = data ?? cachedMovie;
   const metadata = [movie?.year, data?.runtime, data?.genre].filter(Boolean).join(" · ");
-  const errorKind = error instanceof OmdbError ? error.kind : undefined;
-  const canRetry = errorKind === "server" || errorKind === "network";
-  const needApiKey = errorKind === "config" || errorKind === "auth";
-  const errorMessage = needApiKey
-    ? "Set a valid EXPO_PUBLIC_OMDB_API_KEY in .env.local and restart the app."
-    : "There's a problem loading movie details.";
 
   return (
     <ScrollView contentContainerStyle={styles.content}>
@@ -51,8 +45,15 @@ export default function MovieDetailsScreen({ imdbId }: MovieDetailsScreenProps) 
         </View>
       )}
       {isPending && <Text style={styles.body}>Loading movie...</Text>}
-      {error != null && <Text style={styles.body}>{errorMessage}</Text>}
-      {canRetry && <Button title="Retry" disabled={isFetching} onPress={() => void refetch()} />}
+      {error != null && (
+        <MovieLoadError
+          error={error}
+          message="There's a problem loading movie details."
+          isFetching={isFetching}
+          refetch={refetch}
+          textStyle={styles.body}
+        />
+      )}
     </ScrollView>
   );
 }

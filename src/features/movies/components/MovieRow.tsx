@@ -10,7 +10,7 @@ type MovieRowProps = {
 };
 
 export default function MovieRow({ movie, onPress }: MovieRowProps) {
-  const { data: details } = useMovieDetails(movie.imdbId);
+  const { data: details } = useMovieDetails(movie.imdbId, { enabled: false });
   const genre = details?.genre;
   const label = [movie.title, movie.year, genre].filter(Boolean).join(", ");
 

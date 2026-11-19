@@ -1,3 +1,4 @@
+import { isImdbId } from "../imdbId";
 import type { MovieSummary, MovieDetails } from "../types";
 
 type OmdbErrorKind =
@@ -18,6 +19,10 @@ export class OmdbError extends Error {
     this.name = "OmdbError";
     this.kind = kind;
   }
+}
+
+export function isRetryableOmdbError(error: unknown): boolean {
+  return error instanceof OmdbError && (error.kind === "network" || error.kind === "server");
 }
 
 export async function requestOmdb(
@@ -125,7 +130,7 @@ export async function getMovie(imdbId: string, signal?: AbortSignal): Promise<Mo
 
   const parsedMovieDetails = parseMovieDetails(raw);
 
-  if (parsedMovieDetails === undefined) {
+  if (parsedMovieDetails?.imdbId !== imdbId) {
     throw new OmdbError("invalid-response", "Invalid movie details response");
   }
 
@@ -175,7 +180,7 @@ function parseMovieSummary(rawMovieSummary: unknown): MovieSummary | undefined {
 
   const title = readText(rawMovieSummary.Title);
   const imdbId = readText(rawMovieSummary.imdbID);
-  if (!title || !imdbId || !/^tt[0-9]+$/.test(imdbId)) {
+  if (!title || !isImdbId(imdbId)) {
     return undefined;
   }
 
