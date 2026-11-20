@@ -49,6 +49,7 @@ test("getMovie maps OMDb Actors to cast", async () => {
 test.each([
   ["not-found", { Response: "False", Error: "Movie not found!" }],
   ["invalid-response", { Response: "True", imdbID: "tt0372784" }],
+  ["invalid-response", { Response: "True", imdbID: "tt0468569", Title: "The Dark Knight" }],
 ])("getMovie rejects with %s for the corresponding OMDb response", async (kind, payload) => {
   mockOmdbResponse(payload);
 
